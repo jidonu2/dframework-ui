@@ -5,7 +5,7 @@ require("core-js/modules/es.weak-map.js");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.saveRecord = exports.getRecord = exports.getList = exports.deleteRecord = void 0;
+exports.saveRecord = exports.getRecord = exports.getLookups = exports.getList = exports.deleteRecord = void 0;
 require("core-js/modules/es.array.includes.js");
 require("core-js/modules/es.array.push.js");
 require("core-js/modules/es.array.sort.js");
@@ -420,3 +420,42 @@ const saveRecord = exports.saveRecord = async function saveRecord(_ref5) {
   }
   return false;
 };
+const getLookups = async _ref6 => {
+  let {
+    api,
+    setIsLoading,
+    setActiveRecord,
+    modelConfig,
+    setError,
+    lookups,
+    scopeId
+  } = _ref6;
+  api = api || (modelConfig === null || modelConfig === void 0 ? void 0 : modelConfig.api);
+  setIsLoading(true);
+  const searchParams = new URLSearchParams();
+  const url = "".concat(api, "/lookups");
+  searchParams.set("lookups", lookups);
+  searchParams.set("scopeId", scopeId);
+  try {
+    const response = await (0, _httpRequest.transport)({
+      url: "".concat(url, "?").concat(searchParams.toString()),
+      method: 'GET',
+      credentials: 'include'
+    });
+    if (response.status === _httpRequest.HTTP_STATUS_CODES.OK) {
+      setActiveRecord(response.data);
+    } else if (response.status === _httpRequest.HTTP_STATUS_CODES.UNAUTHORIZED) {
+      // setError('Session Expired!');
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 2000);
+    } else {
+      // setError('Could not load lookups', response.body.toString());
+    }
+  } catch (error) {
+    // setError('Could not load lookups', error);
+  } finally {
+    setIsLoading(false);
+  }
+};
+exports.getLookups = getLookups;

@@ -240,7 +240,8 @@ const RenderColumns = _ref3 => {
     combos,
     lookups,
     fieldConfigs,
-    mode
+    mode,
+    getRecordAndLookups = () => {}
   } = _ref3;
   const classes = useStyles();
   if (!(formElements !== null && formElements !== void 0 && formElements.length)) {
@@ -285,14 +286,16 @@ const RenderColumns = _ref3 => {
       data: data,
       onChange: onChange,
       combos: combos,
-      lookups: lookups
+      lookups: lookups,
+      getRecordAndLookups: getRecordAndLookups
     }, otherProps))));
   }));
 };
 const getFormConfig = function getFormConfig(_ref5) {
   let {
     columns,
-    tabs = {}
+    tabs = {},
+    getRecordAndLookups
   } = _ref5;
   const formElements = [],
     tabColumns = {};
@@ -351,7 +354,8 @@ const FormLayout = _ref6 => {
     id: displayId,
     fieldConfigs,
     mode,
-    handleSubmit
+    handleSubmit,
+    getRecordAndLookups = () => {}
   } = _ref6;
   const classes = useStyles();
   const {
@@ -366,7 +370,8 @@ const FormLayout = _ref6 => {
       tabColumns
     } = getFormConfig({
       columns: model.columns,
-      tabs: showTabs ? model.tabs : {}
+      tabs: showTabs ? model.tabs : {},
+      getRecordAndLookups
     });
     return {
       formElements,
@@ -375,6 +380,7 @@ const FormLayout = _ref6 => {
     };
   }, [model]);
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(RenderColumns, {
+    getRecordAndLookups: getRecordAndLookups,
     formElements: formElements,
     model: model,
     formik: formik,

@@ -335,6 +335,10 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     },
     "boolean": {
       renderCell: booleanIconRenderer
+    },
+    "select": {
+      "type": "singleSelect",
+      "valueOptions": "lookup"
     }
   };
   (0, _react.useEffect)(() => {
@@ -511,7 +515,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     if (!forAssignment && !isReadOnly) {
       const actions = [];
       if (effectivePermissions !== null && effectivePermissions !== void 0 && effectivePermissions.edit) {
-        actions.push( /*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
+        actions.push(/*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
           icon: /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
             title: "Edit"
           }, "   ", /*#__PURE__*/_react.default.createElement(_Edit.default, null)),
@@ -521,7 +525,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
         }));
       }
       if (effectivePermissions.add) {
-        actions.push( /*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
+        actions.push(/*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
           icon: /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
             title: "Copy"
           }, /*#__PURE__*/_react.default.createElement(_FileCopy.default, null), " "),
@@ -531,7 +535,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
         }));
       }
       if (effectivePermissions.delete) {
-        actions.push( /*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
+        actions.push(/*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
           icon: /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
             title: "Delete"
           }, /*#__PURE__*/_react.default.createElement(_Delete.default, null), " "),

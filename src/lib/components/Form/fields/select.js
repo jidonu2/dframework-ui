@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FormHelperText } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import FormControl from '@mui/material/FormControl';
@@ -6,9 +6,30 @@ import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 
+const SelectField = ({ column, field, fieldLabel, formik, activeRecord, lookups, otherProps, classes, onChange, getRecordAndLookups }) => {
+    const [loading, setIsloading] = React.useState(false);
+    const [options, setOptions] = React.useState(typeof column.lookup === 'string' ? lookups[column.lookup] : column.lookup);
+    const setActiveRecord = (lookups) => {
+        const { State } = lookups;
+        if (!State) return;
+        setOptions(State);
+    }
+    const onOpen = () => {
+        if (!column.parentComboType) return;
+        const valueField = column.parentComboValueField || column.parentComboType + 'Id';
+        if (!formik.values[valueField]) return;
+        getRecordAndLookups({
+            scopeId: formik.values[valueField],
+            lookups: column.lookup,
+            customSetIsLoading: setIsloading,
+            customSetActiveRecord: setActiveRecord
+        });
+    };
 
-const field = ({ column, field, fieldLabel, formik, activeRecord, lookups, otherProps, classes, onChange }) => {
-    const options = typeof column.lookup === 'string' ? lookups[column.lookup] : column.lookup;
+    useEffect(() => {
+        onOpen();
+    }, [formik.values[column.parentComboValueField || column.parentComboType + 'Id']])
+
     let inputValue = formik.values[field];
     if (column.multiSelect) {
         if (!inputValue || inputValue.length === 0) {
@@ -30,6 +51,8 @@ const field = ({ column, field, fieldLabel, formik, activeRecord, lookups, other
                 IconComponent={KeyboardArrowDownIcon}
                 {...otherProps}
                 name={field}
+                // disabled={loading}
+                onOpen={onOpen}
                 multiple={column.multiSelect === true}
                 readOnly={column.readOnly === true}
                 value={`${inputValue}`}
@@ -50,4 +73,4 @@ const field = ({ column, field, fieldLabel, formik, activeRecord, lookups, other
     )
 }
 
-export default field;
+export default SelectField;

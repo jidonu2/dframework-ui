@@ -45,9 +45,9 @@ class UiModel {
     const { columns } = this;
     let validationConfig = {};
     for (const column of columns) {
-      const { field, label, header, type = 'string', requiredIfNew = false, required = false, min = '', max = '', validationLength = 0 } = column;
+      const { field, label, header, type = 'string', requiredIfNew = false, required = false, min = '', max = '', validationLength = 0, fieldLabel } = column;
       const formLabel = label || header || field;
-      if (!formLabel) {
+      if (!formLabel || !fieldLabel) {
         continue;
       }
       let config;

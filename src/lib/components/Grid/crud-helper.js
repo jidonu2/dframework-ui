@@ -316,9 +316,39 @@ const saveRecord = async function ({ id, api, values, setIsLoading, setError }) 
     return false;
 };
 
+const getLookups = async ({ api, setIsLoading, setActiveRecord, modelConfig, setError, lookups, scopeId }) => {
+    api = api || modelConfig?.api
+    setIsLoading(true);
+    const searchParams = new URLSearchParams();
+    const url = `${api}/lookups`;
+    searchParams.set("lookups", lookups);
+    searchParams.set("scopeId", scopeId);
+    try {
+        const response = await transport({
+            url: `${url}?${searchParams.toString()}`,
+            method: 'GET',
+            credentials: 'include'
+        });
+        if (response.status === HTTP_STATUS_CODES.OK) {
+            setActiveRecord(response.data);
+        } else if (response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
+            // setError('Session Expired!');
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 2000);
+        } else {
+            // setError('Could not load lookups', response.body.toString());
+        }
+    } catch (error) {
+        // setError('Could not load lookups', error);
+    } finally {
+        setIsLoading(false);
+    }
+};
 export {
     getList,
     getRecord,
     deleteRecord,
     saveRecord,
+    getLookups
 };

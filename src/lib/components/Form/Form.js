@@ -1,7 +1,7 @@
 import React from 'react';
 import { useFormik } from 'formik';
 import { useState, useEffect, createContext } from 'react';
-import { getRecord, saveRecord, deleteRecord } from '../Grid/crud-helper';
+import { getRecord, saveRecord, deleteRecord, getLookups } from '../Grid/crud-helper';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
@@ -10,8 +10,6 @@ import Box from '@mui/material/Box';
 import FormLayout from './field-mapper';
 import { useSnackbar } from '../SnackBar';
 import { DialogComponent } from '../Dialog';
-import PageTitle from '../PageTitle';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { useStateContext, useRouter } from '../useRouter/StateProvider';
 import actionsStateProvider from '../useRouter/actions';
 export const ActiveStepContext = createContext(1);
@@ -23,11 +21,9 @@ const Form = ({
     permissions = { edit: true, export: true, delete: true },
     Layout = FormLayout,
 }) => {
-    const location = useLocation();
-    const currentPath = location.pathname; // e.g., /api/contact/0
-    const navigateBack = currentPath.substring(0, currentPath.lastIndexOf('/')); // removes the last segment
+    const { navigate, getParams, useParams, pathname } = useRouter()
+    const navigateBack = pathname.substring(0, pathname.lastIndexOf('/')); // removes the last segment
     const { dispatchData, stateData } = useStateContext();
-    const { navigate, getParams, useParams } = useRouter()
     const { id: idWithOptions } = useParams() || getParams;
     const id = idWithOptions?.split('-')[0];
     const [isLoading, setIsLoading] = useState(true);
@@ -46,22 +42,40 @@ const Form = ({
     let gridApi = `${url}${model.api || api}`
     const { mode } = stateData.dataForm;
 
-    useEffect(() => {
-        setValidationSchema(model.getValidationSchema({ id, snackbar }));
+    const getRecordAndLookups = ({ lookups, scopeId, customSetIsLoading, customSetActiveRecord }) => {
         const options = idWithOptions?.split('-');
         try {
-            getRecord({
-                id: options.length > 1 ? options[1] : options[0],
-                api: gridApi,
-                modelConfig: model,
-                setIsLoading,
-                setError: errorOnLoad,
-                setActiveRecord
-            })
+            const params = {
+                api: api || gridApi,
+                modelConfig: model, 
+                setError: errorOnLoad
+            }
+            if(lookups){
+                getLookups({
+                    ...params,
+                    // setIsLoading, 
+                    setIsLoading: customSetIsLoading || setIsLoading, 
+                    setActiveRecord: customSetActiveRecord, 
+                    lookups, 
+                    scopeId
+                })
+            }
+            else {
+                getRecord({
+                    ...params,
+                    id: options.length > 1 ? options[1] : options[0],
+                    setIsLoading,
+                    setActiveRecord
+                })
+            }
         } catch (error) {
             snackbar.showError('An error occured, please try after some time.', error);
             navigate(navigateBack);
         }
+    }
+    useEffect(() => {
+        setValidationSchema(model.getValidationSchema({ id, snackbar }));
+        getRecordAndLookups({});
     }, [id, idWithOptions, model]);
 
     const formik = useFormik({
@@ -201,7 +215,7 @@ const Form = ({
                         <Button variant="contained" type="cancel" color="error" onClick={(e) => handleFormCancel(e)}>{`${"Cancel"}`}</Button>
                         {permissions.delete && <Button variant="contained" color="error" onClick={() => setIsDeleting(true)}>{`${"Delete"}`}</Button>}
                     </Stack>
-                    <Layout model={model} formik={formik} data={data} fieldConfigs={fieldConfigs} combos={combos} onChange={handleChange} lookups={lookups} id={id} handleSubmit={handleSubmit} mode={mode} />
+                    <Layout model={model} formik={formik} data={data} fieldConfigs={fieldConfigs} combos={combos} onChange={handleChange} lookups={lookups} id={id} handleSubmit={handleSubmit} mode={mode} getRecordAndLookups={getRecordAndLookups}/>
                 </form>
                 {errorMessage && (<DialogComponent open={!!errorMessage} onConfirm={clearError} onCancel={clearError} title="Info" hideCancelButton={true} > {errorMessage}</DialogComponent>)}
                 <DialogComponent
