@@ -128,10 +128,11 @@ class UiModel {
         required = false,
         min = '',
         max = '',
-        validationLength = 0
+        validationLength = 0,
+        fieldLabel
       } = column;
       const formLabel = label || header || field;
-      if (!formLabel) {
+      if (!formLabel || !fieldLabel) {
         continue;
       }
       let config;

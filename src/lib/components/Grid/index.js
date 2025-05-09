@@ -241,6 +241,10 @@ const GridBase = memo(({
         },
         "boolean": {
             renderCell: booleanIconRenderer
+        },
+        "select": {
+            "type": "singleSelect",
+            "valueOptions": "lookup"
         }
     }
 

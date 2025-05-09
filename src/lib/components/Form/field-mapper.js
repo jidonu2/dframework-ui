@@ -135,7 +135,7 @@ const RenderSteps = ({ tabColumns, model, formik, data, onChange, combos, lookup
     )
 }
 
-const RenderColumns = ({ formElements, model, formik, data, onChange, combos, lookups, fieldConfigs, mode }) => {
+const RenderColumns = ({ formElements, model, formik, data, onChange, combos, lookups, fieldConfigs, mode, getRecordAndLookups = () => {} }) => {
     const classes = useStyles();
     if (!formElements?.length) {
         return null;
@@ -154,7 +154,7 @@ const RenderColumns = ({ formElements, model, formik, data, onChange, combos, lo
                                 : null
                             }
                             <Grid item xs={isGridComponent ? 12 : 10.5} className={classes.childStyles}>
-                                <Component model={model} fieldConfigs={fieldConfigs[field]} mode={mode} column={column} field={field} fieldLabel={fieldLabel} formik={formik} data={data} onChange={onChange} combos={combos} lookups={lookups} {...otherProps} />
+                                <Component model={model} fieldConfigs={fieldConfigs[field]} mode={mode} column={column} field={field} fieldLabel={fieldLabel} formik={formik} data={data} onChange={onChange} combos={combos} lookups={lookups} getRecordAndLookups={getRecordAndLookups} {...otherProps} />
                             </Grid>
                         </Grid >
                     )
@@ -164,7 +164,7 @@ const RenderColumns = ({ formElements, model, formik, data, onChange, combos, lo
     )
 }
 
-const getFormConfig = function ({ columns, tabs = {} }) {
+const getFormConfig = function ({ columns, tabs = {}, getRecordAndLookups}) {
     const formElements = [], tabColumns = {};
     for (const tab in tabs) {
         tabColumns[tab] = [];
@@ -193,16 +193,16 @@ const getFormConfig = function ({ columns, tabs = {} }) {
     return { formElements, tabColumns: tabsData };
 }
 
-const FormLayout = ({ model, formik, data, combos, onChange, lookups, id: displayId, fieldConfigs, mode, handleSubmit }) => {
+const FormLayout = ({ model, formik, data, combos, onChange, lookups, id: displayId, fieldConfigs, mode, handleSubmit, getRecordAndLookups = () => {}}) => {
     const classes = useStyles();
     const { formElements, tabColumns, showTabs } = React.useMemo(() => {
         let showTabs = model?.formConfig?.showTabbed;
-        const { formElements, tabColumns } = getFormConfig({ columns: model.columns, tabs: showTabs ? model.tabs : {} });
+        const { formElements, tabColumns } = getFormConfig({ columns: model.columns, tabs: showTabs ? model.tabs : {}, getRecordAndLookups });
         return { formElements, tabColumns, showTabs: showTabs && tabColumns.length > 0 };
     }, [model]);
     return (
         <div>
-            <RenderColumns formElements={formElements} model={model} formik={formik} data={data} onChange={onChange} combos={combos} lookups={lookups} fieldConfigs={fieldConfigs} mode={mode} />
+            <RenderColumns getRecordAndLookups={getRecordAndLookups} formElements={formElements} model={model} formik={formik} data={data} onChange={onChange} combos={combos} lookups={lookups} fieldConfigs={fieldConfigs} mode={mode} />
             <div className={classes.renderSteps}>
                 <RenderSteps tabColumns={tabColumns} model={model} formik={formik} data={data} onChange={onChange} combos={combos} lookups={lookups} fieldConfigs={fieldConfigs} mode={mode} handleSubmit={handleSubmit} />
             </div>
